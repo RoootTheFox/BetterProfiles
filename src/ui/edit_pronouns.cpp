@@ -9,11 +9,11 @@ using namespace geode::prelude;
 
 EditPronounsPopup* EditPronounsPopup::create(ProfileData* const& profile_data) {
     auto ret = new EditPronounsPopup();
-    if (ret && ret->init(450.f, 280.f, profile_data)) {
+    if (ret && ret->initAnchored(450.f, 280.f, profile_data)) {
         ret->autorelease();
         return ret;
     }
-    
+
     CC_SAFE_DELETE(ret);
     return nullptr;
 }
@@ -138,7 +138,7 @@ void EditPronounsPopup::updateUI() {
             //log::info("no pronouns for set {}", set);
         } else {
             pronoun = pronouns.at(i);
-        }        
+        }
 
         //log::info("pronoun {} in set {}", pronoun, set);
 
@@ -150,15 +150,15 @@ void EditPronounsPopup::updateUI() {
 
         // loop over set_menu children
         for (int j = 0; j < set_menu->getChildren()->count(); j++) {
-            if (auto button = getChildOfType<CCMenuItemSpriteExtra>(set_menu, j)) {
-                if (auto button_sprite = getChildOfType<ButtonSprite>(button, 0)) {
+            if (auto button = set_menu->getChildByType<CCMenuItemSpriteExtra>(j)) {
+                if (auto button_sprite = button->getChildByType<ButtonSprite>(0)) {
                     button_sprite->updateBGImage(TEXTURE_BUTTON_DISABLED);
                 }
             }
         }
 
         if (auto button = typeinfo_cast<CCMenuItemSpriteExtra*>(set_menu->getChildByID(pronoun))) {
-            if (auto button_sprite = getChildOfType<ButtonSprite>(button, 0)) {
+            if (auto button_sprite = button->getChildByType<ButtonSprite>(0)) {
                 button_sprite->updateBGImage(TEXTURE_BUTTON_ENABLED);
             }
         }
@@ -194,7 +194,7 @@ CCMenu* EditPronounsPopup::createPronounSet(int set) {
         .intoMenuItem([this, set](auto) {
             this->onPronounButtonClicked(set, "he");
         }).id("he").parent(menu);
-    
+
     Build<CCLabelBMFont>::create(fmt::format("set {}", set).c_str(), "goldFont.fnt")
         .scale(0.5f)
         .parent(menu);

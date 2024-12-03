@@ -2,6 +2,12 @@
 
 #define TEXTURE_BUTTON_ENABLED "GJ_button_01.png"
 #define TEXTURE_BUTTON_DISABLED "GJ_button_04.png"
+// idk clang complains about these now
+// so import em ig
+#include <optional>
+#include <string>
+#include <matjson.hpp>
+#include <map>
 
 struct ProfileData {
     int id;
@@ -28,43 +34,43 @@ struct ProfileData {
 
 template <>
 struct matjson::Serialize<ProfileData> {
-    static ProfileData from_json(const matjson::Value& value) {
-        return ProfileData {
-            .id = value.try_get<int>("id").value_or(0),
-            .bio = value.try_get<std::string>("bio"),
-            .pronouns = value.try_get<std::string>("pronouns"),
+    static geode::Result<ProfileData> fromJson(const matjson::Value& value) {
+        return geode::Ok(ProfileData {
+            .id = value["id"].as<int>().unwrapOr(0),
+            .bio = value["bio"].asString().unwrapOr(""),
+            .pronouns = value["pronouns"].asString().unwrapOr(""),
             // socials
-            .website = value.try_get<std::string>("website"),
-            .social_github = value.try_get<std::string>("social_github"),
-            .social_bluesky = value.try_get<std::string>("social_bluesky"),
-            .social_fediverse = value.try_get<std::string>("social_fediverse"),
-            .social_discord = value.try_get<std::string>("social_discord"),
-            .social_matrix = value.try_get<std::string>("social_matrix"),
-            .social_tumblr = value.try_get<std::string>("social_tumblr"),
-            .social_myspace = value.try_get<std::string>("social_myspace"),
-            .social_facebook = value.try_get<std::string>("social_facebook"),
-            .color1 = value.try_get<int>("color1"),
-            .color2 = value.try_get<int>("color2"),
-        };
+            .website = value["website"].asString().unwrapOr(""),
+            .social_github = value["social_github"].asString().unwrapOr(""),
+            .social_bluesky = value["social_bluesky"].asString().unwrapOr(""),
+            .social_fediverse = value["social_fediverse"].asString().unwrapOr(""),
+            .social_discord = value["social_discord"].asString().unwrapOr(""),
+            .social_matrix = value["social_matrix"].asString().unwrapOr(""),
+            .social_tumblr = value["social_tumblr"].asString().unwrapOr(""),
+            .social_myspace = value["social_myspace"].asString().unwrapOr(""),
+            .social_facebook = value["social_facebook"].asString().unwrapOr(""),
+            .color1 = value["color1"].as<int>().unwrapOr(0),
+            .color2 = value["color2"].as<int>().unwrapOr(0),
+        });
     }
-    static matjson::Value to_json(const ProfileData& profile_data) {
-        auto res = matjson::Object {
-            { "id", profile_data.id },
-            { "bio", profile_data.bio.value_or("") },
-            { "pronouns", profile_data.pronouns.value_or("") },
-            // socials
-            { "website", profile_data.website.value_or("") },
-            { "social_github", profile_data.social_github.value_or("") },
-            { "social_bluesky", profile_data.social_bluesky.value_or("") },
-            { "social_fediverse", profile_data.social_fediverse.value_or("") },
-            { "social_discord", profile_data.social_discord.value_or("") },
-            { "social_matrix", profile_data.social_matrix.value_or("") },
-            { "social_tumblr", profile_data.social_tumblr.value_or("") },
-            { "social_myspace", profile_data.social_myspace.value_or("") },
-            { "social_facebook", profile_data.social_facebook.value_or("") },
-            { "color1", profile_data.color1.value_or(0) },
-            { "color2", profile_data.color2.value_or(0) },
-        };
+    static matjson::Value toJson(const ProfileData& profile_data) {
+        auto res = matjson::Value();
+        res["id"] = profile_data.id;
+        res["bio"] = profile_data.bio.value_or("");
+        res["pronouns"] = profile_data.pronouns.value_or("");
+        // socials
+        res["website"] = profile_data.website.value_or("");
+        res["social_github"] = profile_data.social_github.value_or("");
+        res["social_bluesky"] = profile_data.social_bluesky.value_or("");
+        res["social_fediverse"] = profile_data.social_fediverse.value_or("");
+        res["social_discord"] = profile_data.social_discord.value_or("");
+        res["social_matrix"] = profile_data.social_matrix.value_or("");
+        res["social_tumblr"] = profile_data.social_tumblr.value_or("");
+        res["social_myspace"] = profile_data.social_myspace.value_or("");
+        res["social_facebook"] = profile_data.social_facebook.value_or("");
+        res["color1"] = profile_data.color1.value_or(0);
+        res["color2"] = profile_data.color2.value_or(0);
+
         // for some reason .value_or(nullptr) crashes, work around this by setting the value null after the fact
         if (!profile_data.bio.has_value()) res["bio"] = nullptr;
         if (!profile_data.pronouns.has_value()) res["pronouns"] = nullptr;

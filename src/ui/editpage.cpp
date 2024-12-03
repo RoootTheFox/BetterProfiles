@@ -17,7 +17,7 @@ EditPage::~EditPage() {
 
 EditPage* EditPage::create(ProfileData const& profile_data) {
     auto ret = new EditPage();
-    if (ret && ret->init(450.f, 280.f, profile_data)) {
+    if (ret && ret->initAnchored(450.f, 280.f, profile_data)) {
         ret->m_profile_data = profile_data;
         ret->m_original_data = profile_data;
         ret->autorelease();
@@ -30,7 +30,7 @@ EditPage* EditPage::create(ProfileData const& profile_data) {
 bool EditPage::setup(ProfileData const& profile_data) {
     current_edit_page = this;
     auto win_size = CCDirector::sharedDirector()->getWinSize();
-    
+
     this->setTitle("Customize Profile");
 
     // if the user isn't logged in, show a login button
@@ -84,7 +84,7 @@ void EditPage::setupLoggedIn() {
         .layout(ColumnLayout::create())
         .parent(m_mainLayer)
         .collect();
-    
+
     Build<CCLabelBMFont>::create("meow", "bigFont.fnt")
         .parent(main_menu);
 
@@ -132,7 +132,7 @@ void EditPage::setupLoggedIn() {
         .visible(false)
         .parent(m_buttonMenu)
         .store(m_save_button);
-    
+
     // logout button
     Build<ButtonSprite>::create("Logout", 64, true, "bigFont.fnt", "GJ_button_06.png", 32.0f, 1.0f)
         .intoMenuItem([this](auto) {
@@ -154,7 +154,7 @@ void EditPage::onLogin() {
     if(m_login_prompt_2) m_login_prompt_2->setVisible(false);
     if(m_login_button) {
         m_login_button->setEnabled(false);
-        
+
         m_login_sprite->setString("Loading...");
         m_login_sprite->updateBGImage("GJ_button_04.png");
         m_login_sprite->m_label->setColor(ccc3(175, 175, 175));
@@ -186,7 +186,7 @@ void EditPage::onLogin() {
             if(current_edit_page->m_login_button) {
                 current_edit_page->m_login_button->setEnabled(true);
 
-                if (auto button_sprite = getChildOfType<ButtonSprite>(current_edit_page->m_login_button, 0)) {
+                if (auto button_sprite = current_edit_page->m_login_button->getChildByType<ButtonSprite>(0)) {
                     button_sprite->setString("Login");
                     button_sprite->updateBGImage("GJ_button_01.png");
                     button_sprite->m_label->setColor(ccWHITE);
@@ -247,21 +247,23 @@ void EditPage::onSave() {
     m_web_listener.bind([this] (web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             auto response = res->json();
-            if (response == nullptr || response.isErr()) {
-                auto error = response.isErr() ? response.error() : "unknown error";
-                log::info("failed to save profile data: {}", error);
+            if (response.isErr()) {
+                auto error_response = response.isErr() ? response.err() : "unknown error";
+                log::info("failed to save profile data: {}", error_response);
+
+                auto error = error_response.has_value() ? error_response.value() : "unknown error wtf";
 
                 std::string error_str = "";
-                auto json_opt = matjson::parse(error, error_str);
+                auto json_opt = matjson::parse(error);
 
-                if (!json_opt.has_value()) {
+                if (json_opt.isErr()) {
                     log::error("failed to parse json: {}\nServer returned {}", error_str, error);
                     std::string display_error = error;
                     if (error.length() > 100) display_error = "(error too long, check logs for details)";
                     error_str = "Server returned invalid response:\n<cr>" + display_error + "</c>\n" + "Server might be down, check your internet connection and try again later.";
                 } else {
-                    auto json = json_opt.value();
-                    error_str = json.contains("message") ? json["message"].as_string() : "Server returned invalid JSON response";
+                    auto json = json_opt.unwrap();
+                    error_str = json.contains("message") ? json["message"].asString().unwrapOr("") : "Server returned invalid JSON response";
                 }
 
                 FLAlertLayer::create("Failed to save profile", error_str, "OK")->show();

@@ -8,7 +8,7 @@ using namespace geode::prelude;
 
 EditBioPopup* EditBioPopup::create(ProfileData* const& profile_data) {
     auto ret = new EditBioPopup();
-    if (ret && ret->init(450.f, 280.f, profile_data)) {
+    if (ret && ret->initAnchored(450.f, 280.f, profile_data)) {
         ret->autorelease();
         return ret;
     }

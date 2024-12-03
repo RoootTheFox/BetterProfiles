@@ -11,7 +11,7 @@ ExtendedProfilePage* ExtendedProfilePage::create(ProfileData const& profile_data
     ret->m_profile_data = profile_data;
     ret->m_user_score = user_score;
     if (profile_data.id == 0) ret->m_profile_data.id = user_score->m_accountID;
-    if (ret && ret->init(441.f, 292.f, profile_data, user_score)) {
+    if (ret && ret->initAnchored(441.f, 292.f, profile_data, user_score)) {
         ret->autorelease();
         return ret;
     }
@@ -29,7 +29,7 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
     auto col1 = profile_data.color1.has_value() ? Utils::intToColor(profile_data.color1.value_or(0)) : player_col1;
     auto col2 = profile_data.color2.has_value() ? Utils::intToColor(profile_data.color2.value_or(0)) : player_col2;
 
-    auto bg_sprite = getChildOfType<CCScale9Sprite>(this->m_mainLayer, 0);
+    auto bg_sprite = this->m_mainLayer->getChildByType<CCScale9Sprite>(0);
 
     auto popup_content_size = CCSize(0.f, 0.f);
     if (bg_sprite) {

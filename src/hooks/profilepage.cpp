@@ -125,8 +125,8 @@ class $modify(BetterProfilePage, ProfilePage) {
         this->m_fields->m_web_listener.bind([this, account_id] (web::WebTask::Event* e) {
             if (web::WebResponse* res = e->getValue()) {
                 auto response = res->json();
-                if (response == nullptr || response.isErr()) {
-                    auto error = response.isErr() ? response.error() : "unknown error";
+                if (response.isErr()) {
+                    auto error = response.isErr() ? response.err() : "unknown error";
                     log::error("failed to fetch profile data: {}", error);
                     if (current_profile_page != nullptr) {
                         current_profile_page->m_fields->m_profile_data = ProfileData();
@@ -138,7 +138,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                 }
                 auto json = response.unwrap();
 
-                if (!json["success"].as_bool()) {
+                if (!json["success"].asBool().unwrapOr(false)) {
                     log::error("failed to fetch profile data");
                     return;
                 }
@@ -152,7 +152,7 @@ class $modify(BetterProfilePage, ProfilePage) {
                 log::info("fetched profile data");
 
                 // parse data and update UI
-                auto profile_data = json["data"].as<ProfileData>();
+                auto profile_data = json["data"].as<ProfileData>().unwrap(); // TODO: handle errors
                 current_profile_page->m_fields->m_profile_data = profile_data;
                 current_profile_page->m_fields->m_profile_data.id = account_id;
                 current_profile_page->m_fields->m_data_loaded = true;
@@ -189,7 +189,7 @@ class $modify(BetterProfilePage, ProfilePage) {
 
         if (this->m_fields->m_profile_data.pronouns.has_value()) {
             log::debug("pronouns: {}", this->m_fields->m_profile_data.pronouns.value());
-            
+
             this->m_fields->m_pronoun_label->setString(this->m_fields->m_profile_data.pronouns.value().c_str());
             this->m_fields->m_pronoun_label->setVisible(true);
         }

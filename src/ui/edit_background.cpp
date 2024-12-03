@@ -9,7 +9,7 @@ using namespace geode::prelude;
 
 EditBackgroundPopup* EditBackgroundPopup::create(ProfileData* const& profile_data) {
     auto ret = new EditBackgroundPopup();
-    if (ret && ret->init(441.f, 291.5f, profile_data)) {
+    if (ret && ret->initAnchored(441.f, 291.5f, profile_data)) {
         ret->m_profile_data = profile_data;
         ret->autorelease();
         return ret;
@@ -24,7 +24,7 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
     this->setTitle("Customize Profile Gradient");
 
     // copy pasted from extended_profile.cpp (lazy!!)
-    auto bg_sprite = getChildOfType<CCScale9Sprite>(this->m_mainLayer, 0);
+    auto bg_sprite = this->m_mainLayer->getChildByType<CCScale9Sprite>(0);
     auto popup_content_size = CCSize(0.f, 0.f);
     if (bg_sprite) {
         popup_content_size = bg_sprite->getContentSize();
