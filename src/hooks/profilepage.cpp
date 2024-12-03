@@ -34,6 +34,11 @@ class $modify(BetterProfilePage, ProfilePage) {
         // sometimes this function gets called *after*
         // loadPageFromUserInfo, which is where the UI is used
 
+        if (this->m_fields->m_data_loaded) {
+            log::info("you could be my kitty cat");
+            this->updateUIState();
+        }
+
         return true;
     }
 
