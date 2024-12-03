@@ -21,7 +21,7 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
-CPMAddPackage("gh:camila314/uibuilder#main")
+CPMAddPackage("gh:RoootTheFox/uibuilder#main")
 CPMAddPackage("gh:RoootTheFox/dashauth#main")
 target_link_libraries(${PROJECT_NAME} UIBuilder DashAuth)
 

@@ -2,6 +2,7 @@
 
 #include <UIBuilder.hpp>
 #include "ui/extended_profile.hpp"
+#include "GUI/CCControlExtension/CCScale9Sprite.h"
 #include "utils.hpp"
 
 using namespace geode::prelude;
@@ -39,14 +40,14 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
         Build<CCLayerGradient>::create(ccc4(col1.r, col1.g, col1.b, 255), ccc4(col2.r, col2.g, col2.b, 255))
             .contentSize(popup_content_size - ccp(5.f, 5.f))
             .ignoreAnchorPointForPos(false)
-            .pos(win_size / 2)
-            .parent(this->m_mainLayer)
+            //.pos(0, 0)
+            .parentAtPos(this->m_mainLayer, Anchor::Center)
             .store(this->m_background);
 
         Build<CCScale9Sprite>::create("GJ_square07.png")
             .contentSize(popup_content_size)
-            .pos(win_size / 2)
-            .parent(this->m_mainLayer);
+            //.pos(win_size / 2)
+            .parentAtPos(this->m_mainLayer, Anchor::Center);
 
         // when we're done with bg_sprite, nuke it
         bg_sprite->removeFromParentAndCleanup(true);
@@ -56,15 +57,13 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
 
     Build<CCScale9Sprite>::create("square02b_001.png")
         .contentSize(popup_content_size - ccp(15.f, 15.f))
-        .pos(win_size / 2)
         .color(ccc3(0, 0, 0))
         .opacity(50)
-        .parent(this->m_mainLayer);
+        .parentAtPos(this->m_mainLayer, Anchor::Center);
 
     Build<MDTextArea>::create("", ccp(280.f, 150.f))
-        .pos(win_size / 2)
         .store(this->m_bio_area)
-        .parent(this->m_mainLayer);
+        .parentAtPos(this->m_mainLayer, Anchor::Center);
 
     this->setTitle(fmt::format("{}'s Profile", user_score->m_userName));
 
@@ -72,7 +71,7 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
         .playerFrame(user_score->m_playerSpider, IconType::Spider)
         .color(player_col1)
         .secondColor(player_col2)
-        .pos({win_size.width / 4 + 32.f, 32.f})
+        .pos({win_size.width / 4 + 20.f, 20.f})
         .parent(this->m_mainLayer)
         .collect();
 
@@ -81,8 +80,7 @@ bool ExtendedProfilePage::setup(ProfileData const& profile_data, GJUserScore* co
     }
 
     auto menu = Build<CCMenu>::create()
-        .pos(win_size / 2)
-        .parent(this->m_mainLayer)
+        .parentAtPos(this->m_mainLayer, Anchor::Center)
         .collect();
 
     Build<geode::CircleButtonSprite>::create(CCSprite::createWithSpriteFrameName("pencil.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt)

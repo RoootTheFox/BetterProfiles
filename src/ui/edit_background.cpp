@@ -3,6 +3,8 @@
 #include <UIBuilder.hpp>
 
 #include "ui/edit_background.hpp"
+#include "Geode/cocos/menu_nodes/CCMenu.h"
+#include "Geode/ui/Layout.hpp"
 #include "utils.hpp"
 
 using namespace geode::prelude;
@@ -36,14 +38,12 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
         Build<CCLayerGradient>::create(ccc4(col1.r, col1.g, col1.b, 255), ccc4(col2.r, col2.g, col2.b, 255))
             .contentSize(popup_content_size - ccp(5.f, 5.f))
             .ignoreAnchorPointForPos(false)
-            .pos(win_size / 2)
-            .parent(this->m_mainLayer)
+            .parentAtPos(this->m_mainLayer, Anchor::Center)
             .store(this->m_background);
 
         Build<CCScale9Sprite>::create("GJ_square07.png")
             .contentSize(popup_content_size)
-            .pos(win_size / 2)
-            .parent(this->m_mainLayer);
+            .parentAtPos(this->m_mainLayer, Anchor::Center);
 
         // when we're done with bg_sprite, nuke it
         bg_sprite->removeFromParentAndCleanup(true);
@@ -53,13 +53,15 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
 
     Build<CCScale9Sprite>::create("square02b_001.png")
         .contentSize(popup_content_size - ccp(15.f, 15.f))
-        .pos(win_size / 2)
         .color(ccc3(0, 0, 0))
         .opacity(50)
-        .parent(this->m_mainLayer);
+        .parentAtPos(this->m_mainLayer, Anchor::Center);
     // end copy paste meow
 
-    auto main_menu = CCMenu::create();
+    CCMenu* main_menu;
+    Build<CCMenu>::create()
+        .parentAtPos(m_mainLayer, Anchor::Center)
+        .store(main_menu);
 
     Build<ButtonSprite>::create("set end color", 122, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
         .intoMenuItem([this](auto) {
@@ -83,8 +85,6 @@ bool EditBackgroundPopup::setup(ProfileData* const& profile_data) {
 
     main_menu->setLayout(ColumnLayout::create());
     main_menu->updateLayout();
-
-    this->m_mainLayer->addChild(main_menu);
 
     return true;
 }

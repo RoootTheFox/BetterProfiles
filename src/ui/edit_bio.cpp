@@ -3,6 +3,7 @@
 #include <regex>
 
 #include "ui/edit_bio.hpp"
+#include "Geode/ui/Layout.hpp"
 
 using namespace geode::prelude;
 
@@ -27,23 +28,27 @@ bool EditBioPopup::setup(ProfileData* const& profile_data) {
     Build<CCLabelBMFont>::create("newlines are very broken sadly (blame rob)", "goldFont.fnt")
         .id("newlines-brokey-1"_spr)
         .scale(0.5f)
-        .pos(win_size / 2 + ccp(0.f, 105.f))
-        .parent(m_mainLayer)
-        .intoNewSibling(CCLabelBMFont::create("<nl> will get replaced with a newline", "goldFont.fnt"))
+        //.pos(win_size / 2 + ccp(0.f, 105.f))
+        .parentAtPos(m_mainLayer, Anchor::Center)
+        .move(0.f, 105.f)
+        .intoParent<CCLabelBMFont>().create("<nl> will get replaced with a newline", "goldFont.fnt")
             .id("newlines-brokey-2"_spr)
             .scale(0.5f)
-            .pos(win_size / 2 + ccp(0.f, 95.f))
-            .intoNewSibling(CCLabelBMFont::create("editing with newlines will be buggy!", "goldFont.fnt"))
+            //.pos(win_size / 2 + ccp(0.f, 95.f))
+            .parentAtPos(m_mainLayer, Anchor::Center)
+            .move(0.f, 95.f)
+            .intoParent<CCLabelBMFont>().create("editing with newlines will be buggy!", "goldFont.fnt")
                 .id("newlines-brokey-3"_spr)
                 .scale(0.5f)
-                .pos(win_size / 2 + ccp(0.f, 85.f));
+                //.pos(win_size / 2 + ccp(0.f, 85.f));
+                .parentAtPos(m_mainLayer, Anchor::Center)
+                .move(0.f, 85.f);
 
     // this bitch does NOT support newlines :(
     Build<CCTextInputNode>::create(400.f, 200.f, "bio placeholder bleh !!", "chatFont.fnt")
         .id("bio-text-field"_spr)
-        .pos(win_size / 2)
         .store(m_bio_text_node)
-        .parent(m_mainLayer);
+        .parentAtPos(m_mainLayer, Anchor::Center); // todo: this is fucked up bruh
 
     Build<ButtonSprite>::create("Preview", 64, true, "bigFont.fnt", "GJ_button_01.png", 32.0f, 1.0f)
             .intoMenuItem([this](auto) {

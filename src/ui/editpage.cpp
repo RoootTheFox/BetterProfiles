@@ -33,6 +33,8 @@ bool EditPage::setup(ProfileData const& profile_data) {
 
     this->setTitle("Customize Profile");
 
+    m_buttonMenu->ignoreAnchorPointForPosition(true);
+
     // if the user isn't logged in, show a login button
     if (Mod::get()->getSavedValue<std::string>("token", "").empty()) {
         log::info("not logged in!");
@@ -51,14 +53,15 @@ bool EditPage::setup(ProfileData const& profile_data) {
         Build<CCLabelBMFont>::create("You aren't logged in!", "bigFont.fnt")
             .id("login-prompt-1"_spr)
             .scale(0.75f)
-            .pos(win_size / 2 + ccp(0.f, 22.f))
-            .parent(m_mainLayer)
+            .parentAtPos(m_mainLayer, Anchor::Center)
             .store(m_login_prompt_1)
-            .intoNewSibling(CCLabelBMFont::create("Click the button below to log in.", "bigFont.fnt"))
+            .intoParent<CCLabelBMFont>().create("Click the button below to log in.", "bigFont.fnt")
                 .id("login-prompt-2"_spr)
                 .scale(0.65f)
-                .pos(win_size / 2)
+                .parentAtPos(m_mainLayer, geode::Anchor::Center)
                 .store(m_login_prompt_2);
+
+        m_login_prompt_1->setPositionY(m_login_prompt_1->getPositionY() + 22.f);
 
         return true;
     }
@@ -80,9 +83,8 @@ void EditPage::setupLoggedIn() {
 
     // actual UI setup below
     auto main_menu = Build<CCMenu>::create()
-        .pos(win_size / 2)
         .layout(ColumnLayout::create())
-        .parent(m_mainLayer)
+        .parentAtPos(m_mainLayer, Anchor::Center)
         .collect();
 
     Build<CCLabelBMFont>::create("meow", "bigFont.fnt")

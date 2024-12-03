@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ui/edit_pronouns.hpp"
+#include "Geode/ui/Layout.hpp"
 
 using namespace geode::prelude;
 
@@ -27,9 +28,10 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
 
     Build<TextInput>::create(128.f, "they/them", "bigFont.fnt")
         .id("pronouns-input"_spr)
-        .pos(win_size.width / 2, 70.f)
-        .parent(m_mainLayer)
+        .parentAtPos(m_mainLayer, Anchor::Center)
+        .posY(50.f)
         .store(m_pronouns_input);
+
     m_pronouns_input->setFilter("abcdefghijklmnopqrstuvwxyz/");
 
     m_pronouns_input->setString(this->m_profile_data->pronouns.value_or("").c_str());
@@ -41,8 +43,9 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
     Build<CCMenu>::create()
         .id("pronoun-sets-menu"_spr)
         .layout(RowLayout::create()->setGap(18.f))
-        .pos(win_size.width / 2, win_size.height / 2 + 16.f)
-        .parent(m_mainLayer)
+        //.pos(win_size.width / 2, win_size.height / 2 + 16.f)
+        .parentAtPos(m_mainLayer, Anchor::Center)
+        .move(0.f, 16.f)
         .child(this->createPronounSet(1))
         .child(this->createPronounSet(2))
         .child(this->createPronounSet(3))
@@ -55,11 +58,14 @@ bool EditPronounsPopup::setup(ProfileData* const& profile_data) {
     Build<CCLabelBMFont>::create("Note: This is an accessibility feature - please use it responsively.", "goldFont.fnt")
         .id("custom-notice"_spr)
         .scale(0.5f)
-        .pos(win_size.width / 2, 45.f)
-        .parent(m_mainLayer)
-        .intoNewSibling(CCLabelBMFont::create("(abuse will result in a ban)", "goldFont.fnt"))
+        //.pos(win_size.width / 2, 45.f)
+        .parentAtPos(m_mainLayer, Anchor::Center)
+        .posY(25.f)
+        .intoParent<CCLabelBMFont>().create("(abuse will result in a ban)", "goldFont.fnt")
             .scale(0.5f)
-            .pos(win_size.width / 2, 35.f);
+            //.pos(win_size.width / 2, 35.f);
+            .parentAtPos(m_mainLayer, Anchor::Center)
+            .posY(15.f);
 
     return true;
 }
